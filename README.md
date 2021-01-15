@@ -1,5 +1,5 @@
 # mincf
-Write .mcfunction files with a shorter, more concise syntax.
+Write .mcfunction files with a shorter, more concise syntax. This script will monitor for changes in the datapack directory and convert `mincf` syntax into `mcfunction` syntax in the provided output directory. 
 
 ## Examples
 ```
@@ -20,29 +20,40 @@ this.myvar = pack:storage:var
 function something:hello/there foo myvar "apple"
 this.val = call.result
 ```
+The following command shows it monitoring a datapack development directory and outputs the result to a Mincraft world's datapacks directory.
+```
+> python mincf.py ~/.minecraft/saves/world1/datapacks/mypack --src ~/dev/mypack
+```
+Use `Ctrl + C` to quit the program.
 
 ## Installation
+Install the `watchdog` package so that the program can monitor a directory for changes.
+```
+> pip install watchdog
+```
+Clone the repository or download the `mincf.py` script. See the Usage section for how to execute it.
 
 ## Usage
 Start the process with
 ```
-> python mincf.py output_pack_path
+> python mincf.py output_pack_path --src mincf_pack_path
 ```
 For more information use the `--help` option
 ```
-> python mincf.py --help
+> py mincf.py --help
 usage: mincf.py [-h] [-s SRC] dest
 
-Write more concise mcfunction syntax
+Write more concise mcfunction syntax. Quit the program with "Ctrl + C"
 
 positional arguments:
-  dest               Destination datapack directory to output to
+  dest               destination datapack directory to output to
 
 optional arguments:
   -h, --help         show this help message and exit
-  -s SRC, --src SRC  Source datapack directory to monitor
+  -s SRC, --src SRC  source datapack directory to monitor
 ```
 
 ## TODO
  - Update installation and usage sections
- - Handle directory changes
+ - Schema support in VS Code with Datapack Helper Plus
+ - unit tests

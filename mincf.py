@@ -112,8 +112,12 @@ def handle_fs_change_event(event):
     
     print('EVENT:', event.event_type, event.src_path)
     if event.event_type == CREATE or event.event_type == MODIFY:
-        os.makedirs(os.path.dirname(output_src_path), exist_ok=True)
-        shutil.copyfile(event.src_path, output_src_path)
+        
+        if event.is_directory:
+            os.makedirs(output_src_path, exist_ok=True)
+            # shutil.copytree(event.src_path, output_src_path,dirs_exist_ok=True)
+        else:
+            shutil.copyfile(event.src_path, output_src_path)
     elif event.event_type == MOVE:
         output_dest_path = os.path.join(dest_dir,os.path.relpath(event.dest_path, src_dir))
         # print('Move to', event.dest_path, output_dest_path)
@@ -121,14 +125,17 @@ def handle_fs_change_event(event):
         os.makedirs(os.path.dirname(output_dest_path), exist_ok=True)
         shutil.copyfile(event.dest_path, output_dest_path)
     elif event.event_type == DELETE:
-        os.remove(output_src_path)
+        if event.is_directory:
+            shutil.rmtree(output_src_path)
+        else:
+            os.remove(output_src_path)
 
     convert_all_mcf_files(dest_dir)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Write more concise mcfunction syntax')
-    parser.add_argument('dest',type=str, help='Destination datapack directory to output to')
-    parser.add_argument('-s','--src', default=os.getcwd(), type=str, help='Source datapack directory to monitor')
+    parser = argparse.ArgumentParser(description='Write more concise mcfunction syntax. Quit the program with "Ctrl + C"')
+    parser.add_argument('dest',type=str, help='destination datapack directory to output to')
+    parser.add_argument('-s','--src', default=os.getcwd(), type=str, help='source datapack directory to monitor')
     args = parser.parse_args()
     src_dir = args.src
     dest_dir = args.dest
@@ -143,7 +150,7 @@ if __name__ == "__main__":
 
     patterns = "*"
     ignore_patterns = ""
-    ignore_directories = True
+    ignore_directories = False
     case_sensitive = True
     pattern_event_handler = PatternMatchingEventHandler(patterns, ignore_patterns, ignore_directories, case_sensitive)
     
